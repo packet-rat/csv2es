@@ -24,7 +24,9 @@ from pyelasticsearch import bulk_chunks
 from pyelasticsearch import ElasticHttpNotFoundError
 from pyelasticsearch import IndexAlreadyExistsError
 from retrying import retry
-
+import sys
+reload(sys)
+sys.setdefaultencoding('utf-8')
 
 __version__ = '1.0.1'
 thread_local = local()
@@ -132,11 +134,12 @@ def sanitize_delimiter(delimiter, is_tab):
     if delimiter is None:
         return None
     else:
-        d = str(delimiter)
-        if len(d) == 1:
-            return d
-        else:
-            raise Exception('Delimiter cannot be more than 1 character.')
+        return str(',')
+    #    d = str(delimiter)
+    #    if len(d) == 1:
+    #        return d
+    #    else:
+    #        raise Exception('Delimiter cannot be more than 1 character.')
 
 
 @click.command()
@@ -197,8 +200,9 @@ def cli(index_name, delete_index, mapping_file, doc_type, import_file,
         es.create_index(index_name)
         echo('Created new index: ' + index_name, quiet)
     except IndexAlreadyExistsError:
+        pass
         echo('Index ' + index_name + ' already exists', quiet)
-
+        
     echo('Using document type: ' + doc_type, quiet)
     if mapping_file:
         echo('Applying mapping from: ' + mapping_file, quiet)
